@@ -19,6 +19,17 @@ export const Main = styled.main`
   }
 `;
 
+export const LightScreen = styled.div`
+  background: black;
+  height: 100vh;
+  width: 100vw;
+  opacity: 0.3;
+  top: 0;
+  left: 0;
+  position: fixed;
+  display: ${(props) => (props.openedDialog ? "block" : "none")};
+`;
+
 export const SectionAddReminder = styled.section`
   h2 {
     margin-bottom: 1rem;
@@ -46,30 +57,10 @@ export const FormAddReminder = styled.form`
       margin-bottom: 0.8rem;
     }
 
-    @media screen and (min-width: 610px) {
+    @media screen and (min-width: 615px) {
       display: inline;
       margin-right: 0.8rem;
     }
-  }
-
-  input[type="text"] {
-    width: 12rem;
-  }
-
-  input {
-    background: #ced6b0;
-    border: none;
-    padding: 0.3rem;
-    margin-left: 0.6rem;
-
-    ::placeholder {
-      color: #6c6a61;
-      font-size: 0.8rem;
-    }
-  }
-
-  textarea {
-    width: 100%;
   }
 
   div {
@@ -158,6 +149,7 @@ export const ReminderText = styled.div`
 
   li {
     display: flex;
+    align-items: center;
     flex-wrap: nowrap;
     padding: 0.2rem;
   }
@@ -167,13 +159,36 @@ export const ReminderText = styled.div`
   }
 
   li h3:first-child {
-    width: 90%;
+    width: 84%;
+    padding-right: 1rem;
     color: #2b4052;
+
+    @media screen and (min-width: 500px) {
+      width: 90%;
+    }
   }
 
   li span:nth-child(2) {
-    width: 10%;
-    text-align: center;
+    width: 8%;
+
+    @media screen and (min-width: 500px) {
+      width: 5%;
+    }
+  }
+
+  li span:nth-child(3) {
+    width: 8%;
+
+    @media screen and (min-width: 500px) {
+      width: 5%;
+    }
+  }
+`;
+
+export const ButtonOpenDialog = styled.button`
+  img {
+    height: 1rem;
+    width: auto;
   }
 `;
 
@@ -181,5 +196,69 @@ export const ButtonRemoveReminder = styled.button`
   img {
     height: 1.3rem;
     width: auto;
+  }
+`;
+
+export const DialogUpdateReminder = styled.dialog`
+  background: #ced6b0;
+  border: 1px solid #3e475e;
+  margin: auto;
+  width: 90%;
+  min-height: 10%;
+  position: fixed;
+  top: 30%;
+  padding: 0.5rem;
+
+  div {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  @media screen and (min-width: 900px) {
+    width: 60%;
+  }
+
+  @media screen and (min-width: 1400px) {
+    width: 40%;
+  }
+`;
+
+export const ButtonUpdateReminder = styled.button`
+  background: #e6b40f;
+  padding: 0.3rem;
+  color: #fff;
+  font-weight: 500;
+`;
+
+export const FormUpdateReminder = styled.form`
+  fieldset {
+    border: none;
+    width: 100%;
+    padding: 0.8rem;
+  }
+
+  label {
+    width: 100%;
+    display: inline-block;
+    color: #2b4052;
+    font-weight: 500;
+
+    :first-child {
+      margin-bottom: 0.8rem;
+    }
+
+    @media screen and (min-width: 610px) {
+      display: inline;
+      margin-right: 0.8rem;
+    }
+  }
+
+  input {
+    background: #fff;
+  }
+
+  textarea {
+    width: 100%;
   }
 `;

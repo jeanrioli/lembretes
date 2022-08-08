@@ -24,3 +24,19 @@ button {
   background: none;
   cursor: pointer;
 }
+
+input[type="text"] {
+  width: 12rem;
+}
+
+input {
+  background: #ced6b0;
+  border: none;
+  padding: 0.3rem;
+  margin-left: 0.6rem;
+}
+
+input::placeholder {
+  color: #6c6a61;
+  font-size: 0.8rem;
+}

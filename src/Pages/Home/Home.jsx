@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import {
   FormAddReminder,
   ButtonAddReminder,
+  ButtonUpdateReminder,
   ButtonRemoveReminder,
+  ButtonOpenDialog,
+  DialogUpdateReminder,
+  FormUpdateReminder,
+  LightScreen,
   SectionAddReminder,
   ReminderDate,
   ReminderCard,
@@ -11,33 +16,27 @@ import {
   MessageError,
   SectionMyReminders,
 } from "./Home.styles";
-
-const exampleReminders = [
-  {
-    id: 0,
-    date: "2022-08-08",
-    name: "Enviar contrato para representante da empresa",
-  },
-  {
-    id: 1,
-    date: "2022-08-07",
-    name: "Verificar o status das entregas",
-  },
-  {
-    id: 2,
-    date: "2022-08-08",
-    name: "Reunir com o diretor de Marketing",
-  },
-];
+import api from "../../services/api";
 
 const Home = () => {
-  const [remindersList, setRemindersList] = useState(exampleReminders);
+  const [remindersList, setRemindersList] = useState([]);
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [today, setToday] = useState("");
   const [error, setError] = useState("");
+  const [openedDialog, setOpenedDialog] = useState(false);
+  const [reminderToUpdate, setReminderToUpdate] = useState();
+  const [updateName, setUpdateName] = useState("");
+  const [updateDate, setUpdateDate] = useState("");
 
   useEffect(() => {
+    api
+      .get("/reminders")
+      .then((response) => setRemindersList(response.data))
+      .catch((err) => {
+        console.error("Erro" + err);
+      });
+
     const day = new Date();
     setToday(day.toISOString().substring(0, 10));
   }, []);
@@ -58,34 +57,72 @@ const Home = () => {
     setDate(event.target.value);
   }
 
-  function generateId() {
-    if (remindersList.length === 0) {
-      return 1;
-    } else {
-      const lastId = remindersList.find(
-        (reminder, index) => index === remindersList.length - 1
-      ).id;
-      return lastId + 1;
-    }
+  function handleUpdateName(event) {
+    setUpdateName(event.target.value);
+  }
+
+  function handleUpdateDate(event) {
+    setUpdateDate(event.target.value);
   }
 
   function addReminder() {
-    const newRemindersList = [...remindersList];
-
     if (name !== "" && date > today) {
-      newRemindersList.push({ name, date, id: generateId() });
-      setRemindersList(newRemindersList);
-      getSortedUniqueDates();
-      setName("");
-      setDate("");
-      setError("");
+      clearStates();
+      let newReminder = { name, date };
+      api
+        .post("/reminders", newReminder)
+        .then((response) => setRemindersList(response.data))
+        .catch((err) => {
+          console.error("erro" + err);
+        });
     } else {
       setError("Entrada inválida");
     }
   }
 
   function deleteReminder(id) {
-    setRemindersList(remindersList.filter((reminder) => reminder.id !== id));
+    api
+      .delete(`/reminders/${id}`)
+      .then((response) => setRemindersList(response.data))
+      .catch((err) => {
+        console.error("erro", +err);
+      });
+  }
+
+  function openDialogUpdate(id) {
+    setOpenedDialog(!openedDialog);
+    if (!openedDialog) {
+      setReminderToUpdate(id);
+      setUpdateName(remindersList.find((reminder) => reminder.id === id).name);
+      setUpdateDate(remindersList.find((reminder) => reminder.id === id).date);
+    } else {
+      clearStates();
+    }
+    document.body.style.overflow = openedDialog ? "auto" : "hidden";
+  }
+
+  function updateReminder() {
+    if (updateName !== "" && updateDate > today) {
+      let newReminderData = {
+        name: updateName,
+        date: updateDate,
+        id: reminderToUpdate,
+      };
+      api
+        .put(`/reminders`, newReminderData)
+        .then((response) => setRemindersList(response.data))
+        .catch((err) => {
+          console.error("erro", +err);
+        });
+      setOpenedDialog(false);
+      clearStates();
+    }
+  }
+
+  function clearStates() {
+    setName("");
+    setDate("");
+    setError("");
   }
 
   function getDay(reminderDate) {
@@ -114,6 +151,7 @@ const Home = () => {
 
   return (
     <Main>
+      <LightScreen onClick={openDialogUpdate} openedDialog={openedDialog} />
       <SectionAddReminder>
         <h2>Adicionar lembrete</h2>
         <FormAddReminder>
@@ -167,6 +205,17 @@ const Home = () => {
                       <li key={reminder.id}>
                         <h3>{reminder.name}</h3>
                         <span>
+                          <ButtonOpenDialog
+                            onClick={() => openDialogUpdate(reminder.id)}
+                            title="editar este lembrete"
+                          >
+                            <img
+                              src="/pencil-svgrepo-com.svg"
+                              alt="ícone lápis"
+                            />
+                          </ButtonOpenDialog>
+                        </span>
+                        <span>
                           <ButtonRemoveReminder
                             onClick={() => deleteReminder(reminder.id)}
                             title="remover este lembrete"
@@ -182,6 +231,35 @@ const Home = () => {
           </ReminderCard>
         ))}
       </SectionMyReminders>
+      <DialogUpdateReminder open={openedDialog}>
+        <FormUpdateReminder>
+          <h3>Atualizar lembrete</h3>
+          <fieldset>
+            <label>
+              Lembrar de
+              <input
+                type="text"
+                value={updateName}
+                onChange={handleUpdateName}
+              />
+            </label>
+            <label>
+              No dia
+              <input
+                type="date"
+                min={today}
+                value={updateDate}
+                onChange={handleUpdateDate}
+              />
+            </label>
+          </fieldset>
+          <div>
+            <ButtonUpdateReminder type="button" onClick={updateReminder}>
+              Atualizar
+            </ButtonUpdateReminder>
+          </div>
+        </FormUpdateReminder>
+      </DialogUpdateReminder>
     </Main>
   );
 };
