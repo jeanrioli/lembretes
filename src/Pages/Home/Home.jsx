@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   FormAddReminder,
   ButtonAddReminder,
+  ButtonCancelUpdate,
   ButtonUpdateReminder,
   ButtonRemoveReminder,
   ButtonOpenDialog,
@@ -30,16 +31,13 @@ const Home = () => {
   const [updateDate, setUpdateDate] = useState("");
 
   useEffect(() => {
-    api
-      .get("/reminders")
-      .then((response) => setRemindersList(response.data))
-      .catch((err) => {
-        console.error("Erro" + err);
-      });
-
-    const day = new Date();
-    setToday(day.toISOString().substring(0, 10));
+    showReminders();
+    getToday();
   }, []);
+
+  function getToday() {
+    setToday(new Date().toISOString().substring(0, 10));
+  }
 
   function getSortedUniqueDates() {
     const uniqueDates = [
@@ -63,6 +61,15 @@ const Home = () => {
 
   function handleUpdateDate(event) {
     setUpdateDate(event.target.value);
+  }
+
+  function showReminders() {
+    api
+      .get("/reminders")
+      .then((response) => setRemindersList(response.data))
+      .catch((err) => {
+        console.error("Erro" + err);
+      });
   }
 
   function addReminder() {
@@ -114,9 +121,13 @@ const Home = () => {
         .catch((err) => {
           console.error("erro", +err);
         });
-      setOpenedDialog(false);
+      closeDialog();
       clearStates();
     }
+  }
+
+  function closeDialog() {
+    setOpenedDialog(false);
   }
 
   function clearStates() {
@@ -254,6 +265,9 @@ const Home = () => {
             </label>
           </fieldset>
           <div>
+            <ButtonCancelUpdate type="button" onClick={closeDialog}>
+              Cancelar
+            </ButtonCancelUpdate>
             <ButtonUpdateReminder type="button" onClick={updateReminder}>
               Atualizar
             </ButtonUpdateReminder>

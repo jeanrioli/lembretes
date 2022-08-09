@@ -213,6 +213,7 @@ export const DialogUpdateReminder = styled.dialog`
     width: 100%;
     display: flex;
     justify-content: flex-end;
+    gap: 1rem;
   }
 
   @media screen and (min-width: 900px) {
@@ -228,7 +229,12 @@ export const ButtonUpdateReminder = styled.button`
   background: #e6b40f;
   padding: 0.3rem;
   color: #fff;
-  font-weight: 500;
+  font-weight: 600;
+`;
+
+export const ButtonCancelUpdate = styled.button`
+  color: #fd2f4e;
+  font-weight: 600;
 `;
 
 export const FormUpdateReminder = styled.form`
